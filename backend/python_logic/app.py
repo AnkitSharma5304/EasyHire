@@ -11,16 +11,13 @@ from dotenv import load_dotenv
 import os
 import traceback
 
-
 load_dotenv()
-
 
 app = Flask(__name__)
 
 # Use a default fallback if FRONTEND_URL is missing
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 CORS(app, origins=[FRONTEND_URL], supports_credentials=True)
-
 
 print(" Loading spaCy model...")
 try:
@@ -32,19 +29,18 @@ except OSError:
     download("en_core_web_sm")
     nlp = spacy.load("en_core_web_sm")
 
-
 mongo_uri = os.getenv("MONGO_URI")
 if not mongo_uri:
-    # Fallback or raise error
     print(" Warning: MONGO_URI not found in env, checking local default...")
-    # You can comment this out if you strictly want to fail without env
-    # raise Exception("MONGO_URI not set in environment variables")
 
 print(" Connecting to MongoDB...")
-# Ensure we have a valid URI before connecting
+
 if mongo_uri:
     client = MongoClient(mongo_uri)
-    db = client["chat-app-db"] # this was creating issue as there was test db
+    
+    #  Updated Database Name to match your Cloud DB
+    db = client["job-portal-db"] 
+    
     jobs_collection = db["jobs"]
     print(" Connected to MongoDB.")
 else:
@@ -74,7 +70,6 @@ def match_jobs(extracted_skills):
     matched_jobs = []
     extracted_skills_set = set(extracted_skills)
 
-    # Ensure jobs_collection is accessible
     if 'jobs_collection' in globals():
         for job in jobs_collection.find():
             requirements = job.get("requirements", [])
@@ -137,7 +132,9 @@ def upload_resume():
 
 
 if __name__ == "__main__":
-    # CRITICAL FIX: Force Port 5000 to avoid conflict with Node Backend (Port 8000)
-    PORT = 5000
-    print(f" Starting Flask server at http://0.0.0.0:{PORT}")
-    app.run(host="0.0.0.0", port=PORT, debug=True)
+    # Use Dynamic Port for Render Deployment
+    port = int(os.environ.get("PORT", 5000))
+    print(f" Starting Flask server at http://0.0.0.0:{port}")
+    
+    # Disable debug mode in production
+    app.run(host="0.0.0.0", port=port, debug=False)

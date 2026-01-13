@@ -81,19 +81,19 @@ export const register = async (req, res) => {
     res
       .status(201)
       // ✅ NEW (Works on Localhost)
-      .cookie("token", token, {
-        httpOnly: true,
-        sameSite: "lax", // Change from "None" to "lax"
-        secure: false, // Force false for localhost HTTP
-        maxAge: 24 * 60 * 60 * 1000,
-      })
-      // THIS WHEN PRODUCTION CODE WILL BE DONE
       // .cookie("token", token, {
       //   httpOnly: true,
-      //   secure: process.env.NODE_ENV === "production",
-      //   sameSite: "None",
+      //   sameSite: "lax", // Change from "None" to "lax"
+      //   secure: false, // Force false for localhost HTTP
       //   maxAge: 24 * 60 * 60 * 1000,
       // })
+      // THIS WHEN PRODUCTION CODE WILL BE DONE
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "None",
+        maxAge: 24 * 60 * 60 * 1000,
+      })
       .json({
         message: "Account created successfully.",
         success: true,
@@ -149,19 +149,19 @@ export const login = async (req, res) => {
     res
       .status(200)
       // ✅ NEW (Works on Localhost)
-      .cookie("token", token, {
-        httpOnly: true,
-        sameSite: "lax", // Change from "None" to "lax"
-        secure: false, // Force false for localhost HTTP
-        maxAge: 24 * 60 * 60 * 1000,
-      })
-      // When prodction downside code 
       // .cookie("token", token, {
       //   httpOnly: true,
-      //   secure: process.env.NODE_ENV === "production",
-      //   sameSite: "None",
+      //   sameSite: "lax", // Change from "None" to "lax"
+      //   secure: false, // Force false for localhost HTTP
       //   maxAge: 24 * 60 * 60 * 1000,
       // })
+      // When prodction downside code 
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "None",
+        maxAge: 24 * 60 * 60 * 1000,
+      })
 
       .json({
         message: `Welcome back ${user.fullname}`,
@@ -287,55 +287,58 @@ export const getUserById = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+// updated this for production 
 
 export const updateProfile = async (req, res) => {
-  try {
-    const { fullname, email, phoneNumber, bio, skills } = req.body;
+    try {
+        const { fullname, email, phoneNumber, bio, skills } = req.body;
+        
+        // ✅ FIX: Only process file if it exists
+        let cloudResponse;
+        if (req.file) {
+            const fileUri = getDataUri(req.file);
+            cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+                resource_type: "raw", // Keep raw for PDFs/Resumes
+            });
+        }
 
-    const file = req.file;
-    const fileUri = getDataUri(file);
+        let skillsArray;
+        if (skills) {
+            skillsArray = skills.split(",").map((skill) => skill.trim());
+        }
 
-    const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
-      resource_type: "raw",
-    });
+        const userId = req.id;
+        let user = await User.findById(userId);
 
-    let skillsArray;
-    if (skills) {
-      skillsArray = skills.split(",").map((skill) => skill.trim());
+        if (!user) {
+            return res.status(400).json({
+                message: "User not found.",
+                success: false,
+            });
+        }
+
+        // Update text fields
+        if (fullname) user.fullname = fullname;
+        if (email) user.email = email;
+        if (phoneNumber) user.phoneNumber = phoneNumber;
+        if (bio) user.profile.bio = bio;
+        if (skillsArray) user.profile.skills = skillsArray;
+
+        // ✅ FIX: Only update resume/photo if a new file was uploaded
+        if (cloudResponse) {
+            user.profile.resume = cloudResponse.secure_url;
+            user.profile.resumeOriginalName = req.file.originalname;
+        }
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "Profile updated successfully.",
+            user,
+            success: true,
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal Server Error", success: false });
     }
-
-    const userId = req.id;
-    let user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(400).json({
-        message: "User not found.",
-        success: false,
-      });
-    }
-
-    if (fullname) user.fullname = fullname;
-    if (email) user.email = email;
-    if (phoneNumber) user.phoneNumber = phoneNumber;
-    if (bio) user.profile.bio = bio;
-    if (skillsArray) user.profile.skills = skillsArray;
-
-    if (cloudResponse) {
-      user.profile.resume = cloudResponse.secure_url;
-      user.profile.resumeOriginalName = file.originalname;
-    }
-
-    await user.save();
-
-    return res.status(200).json({
-      message: "Profile updated successfully.",
-      user,
-      success: true,
-    });
-  } catch (error) {
-    console.log(error);
-    return res
-      .status(500)
-      .json({ message: "Internal Server Error", success: false });
-  }
 };
