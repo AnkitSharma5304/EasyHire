@@ -1,0 +1,157 @@
+import React, { useEffect, useState } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../ui/table';
+import { Avatar, AvatarImage } from '../ui/avatar';
+import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover';
+import { Edit2, MoreHorizontal, Briefcase } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
+const CompaniesTable = () => {
+  const { companies, searchCompanyByText } = useSelector(store => store.company);
+  const { user } = useSelector(store => store.auth); 
+  const [filteredCompanies, setFilteredCompanies] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) return;
+
+    const filtered = companies.filter(company => {
+      const matchesSearch =
+        !searchCompanyByText || company?.name?.toLowerCase().includes(searchCompanyByText.toLowerCase());
+
+      const isCreatedByUser =
+        company?.userId === user._id || company?.userId?._id === user._id;
+
+      return matchesSearch && isCreatedByUser;
+    });
+
+    setFilteredCompanies(filtered);
+  }, [companies, searchCompanyByText, user]);
+
+  return (
+    <div className="overflow-x-auto rounded-2xl border border-ash-grey bg-white shadow-md animate-fadeIn">
+      <Table className="min-w-full">
+        <TableHeader className="bg-soft-linen border-b border-ash-grey">
+          <TableRow>
+            <TableHead className="text-gray-700 font-semibold">Logo</TableHead>
+            <TableHead className="text-gray-700 font-semibold">Name</TableHead>
+            <TableHead className="text-gray-700 font-semibold">Description</TableHead>
+            <TableHead className="text-gray-700 font-semibold">Website</TableHead>
+            <TableHead className="text-gray-700 font-semibold">Location</TableHead>
+            <TableHead className="text-gray-700 font-semibold">Date</TableHead>
+            <TableHead className="text-gray-700 font-semibold text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+
+        <TableBody>
+          {filteredCompanies.map(company => (
+            <TableRow
+              key={company._id}
+              className="hover:bg-soft-linen/50 transition-all duration-300 border-b border-ash-grey"
+            >
+              <TableCell>
+                <Avatar className="bg-white border border-ash-grey shadow-sm">
+                  <AvatarImage src={company.logo} alt={company.name} />
+                </Avatar>
+              </TableCell>
+
+              <TableCell className="text-gray-800 font-medium">{company.name}</TableCell>
+              <TableCell className="text-gray-600 text-sm">{company.description || '—'}</TableCell>
+
+              <TableCell>
+                {company.website ? (
+                  <a
+                    href={company.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-tropical-teal underline hover:text-tropical-teal/80"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    Visit
+                  </a>
+                ) : (
+                  <span className="text-gray-400">—</span>
+                )}
+              </TableCell>
+
+              <TableCell className="text-gray-600 text-sm">{company.location || '—'}</TableCell>
+              <TableCell className="text-gray-500 text-sm">
+                {new Date(company.createdAt).toLocaleDateString()}
+              </TableCell>
+
+              <TableCell className="text-right">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      onClick={e => e.stopPropagation()}
+                      className="p-2 rounded-full hover:bg-soft-linen transition"
+                    >
+                      <MoreHorizontal size={20} className="text-gray-500" />
+                    </button>
+                  </PopoverTrigger>
+
+                  <PopoverContent
+                    className="w-52 p-3 bg-white border border-ash-grey rounded-xl shadow-xl space-y-2"
+                    align="end"
+                    onOpenAutoFocus={e => e.preventDefault()}
+                  >
+                    <div
+                      onClick={e => {
+                        e.stopPropagation();
+                        navigate(`/admin/companies/${company._id}`);
+                      }}
+                      className="flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-tropical-teal bg-tropical-teal/10 hover:bg-tropical-teal/20 transition font-medium cursor-pointer"
+                    >
+                      <Edit2 size={18} className="text-tropical-teal" />
+                      <span>Edit Company</span>
+                    </div>
+
+                    <div
+                      onClick={e => {
+                        e.stopPropagation();
+                        navigate(`/admin/companies/${company._id}/jobs`);
+                      }}
+                      className="flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-vibrant-coral bg-vibrant-coral/10 hover:bg-vibrant-coral/20 transition font-medium cursor-pointer"
+                    >
+                      <Briefcase size={18} className="text-vibrant-coral" />
+                      <span>View Jobs</span>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </TableCell>
+            </TableRow>
+          ))}
+
+          {filteredCompanies.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                No companies found.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+
+      {/* Animations */}
+      <style>{`
+        @keyframes fadeIn {
+          0% { opacity: 0; transform: translateY(10px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.5s ease-out;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default CompaniesTable;
