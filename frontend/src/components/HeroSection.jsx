@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from './ui/button';
-import { Search, Sparkles } from 'lucide-react';
+import { Search, Sparkles, Briefcase, Users, Building2 } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { setSearchedQuery } from '@/redux/jobSlice';
 import { useNavigate } from 'react-router-dom';
@@ -17,98 +17,125 @@ const HeroSection = () => {
     navigate("/browse");
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.2 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  };
+
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-soft-linen via-lemon-chiffon to-soft-linen py-20 md:py-28">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-vibrant-coral rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-slow"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-tropical-teal rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+    <section className="relative overflow-hidden bg-gradient-to-br from-soft-linen via-lemon-chiffon to-soft-linen pt-24 pb-16 md:pt-32 md:pb-24">
+      
+      {/* Background Decor */}
+      <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-tropical-teal/10 rounded-full blur-[80px] mix-blend-multiply"></div>
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-vibrant-coral/10 rounded-full blur-[80px] mix-blend-multiply"></div>
       </div>
 
-      <div className="relative max-w-6xl mx-auto px-6 text-center">
+      {/* Floating Icons */}
+      <motion.div 
+        animate={{ y: [0, -15, 0] }} 
+        transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+        className="absolute top-20 left-[5%] opacity-10 hidden lg:block pointer-events-none"
+      >
+        <Briefcase size={64} className="text-tropical-teal" />
+      </motion.div>
+      <motion.div 
+        animate={{ y: [0, 15, 0] }} 
+        transition={{ repeat: Infinity, duration: 6, ease: "easeInOut", delay: 1 }}
+        className="absolute bottom-40 right-[5%] opacity-10 hidden lg:block pointer-events-none"
+      >
+        <Search size={64} className="text-vibrant-coral" />
+      </motion.div>
+
+      <div className="relative max-w-5xl mx-auto px-6 text-center z-10">
+        
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
         >
-          <motion.span 
-            className="inline-flex items-center gap-2 px-5 py-2 mb-6 rounded-full bg-white/80 border border-ash-grey text-tropical-teal text-sm font-semibold tracking-wide shadow-md backdrop-blur-sm"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400 }}
+          {/* Badge */}
+          <motion.div variants={itemVariants} className="flex justify-center mb-6">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 border border-ash-grey text-tropical-teal text-sm font-bold tracking-wide shadow-sm backdrop-blur-sm">
+              <Sparkles className="w-4 h-4 fill-current" />
+              #1 Job Hunt Platform
+            </span>
+          </motion.div>
+
+          {/* Heading - Cleaned up (No underline) */}
+          <motion.h1 
+            variants={itemVariants}
+            className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6 text-gray-800 tracking-tight"
           >
-            <Sparkles className="w-4 h-4" />
-            EasyHire – #1 Job Hunt Platform
-          </motion.span>
-        </motion.div>
+            Find Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-tropical-teal to-teal-600">Dream Job</span> <br className="hidden sm:block"/>
+            <span className="block mt-1">
+              Match Your Skills
+            </span>
+          </motion.h1>
 
-        <motion.h1 
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6 text-gray-800 tracking-tight"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-        >
-          <span className="block mb-2">Discover Jobs</span>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-vibrant-coral via-tropical-teal to-vibrant-coral">
-            That Match Your Skills
-          </span>
-        </motion.h1>
-
-        <motion.p 
-          className="max-w-2xl mx-auto text-lg sm:text-xl text-gray-600 mb-12 leading-relaxed"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-        >
-          Apply to roles from trusted companies and take the next step in your career.
-        </motion.p>
-
-        <motion.div 
-          className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 max-w-2xl mx-auto"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.6 }}
-        >
-          <div className="relative flex-1">
-            <input
-              type="text"
-              placeholder="Search jobs by title, company, or location..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && searchJobHandler()}
-              className="w-full px-6 py-4 pr-12 rounded-full bg-white/90 text-gray-800 border-2 border-ash-grey placeholder-gray-400 shadow-lg focus:ring-2 focus:ring-tropical-teal focus:border-tropical-teal focus:outline-none transition-all duration-300 text-base backdrop-blur-sm"
-            />
-            <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          </div>
-          <Button
-            onClick={searchJobHandler}
-            className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-vibrant-coral to-red-500 hover:from-red-500 hover:to-red-600 text-white font-semibold transition-all duration-300 shadow-lg hover:shadow-xl text-base border border-transparent hover:border-red-300"
+          {/* Subtitle */}
+          <motion.p 
+            variants={itemVariants}
+            className="max-w-2xl mx-auto text-base sm:text-lg text-gray-700 font-medium mb-10 leading-relaxed"
           >
-            <Search className="h-5 w-5 mr-2" /> Search
-          </Button>
-        </motion.div>
+            Connecting thousands of job seekers with top-tier companies. <br className="hidden sm:block"/>
+            Your next big career move is just one search away.
+          </motion.p>
 
-        {/* Stats */}
-        <motion.div 
-          className="grid grid-cols-3 gap-8 mt-16 max-w-2xl mx-auto"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.8 }}
-        >
-          {[
-            { number: '10K+', label: 'Active Jobs' },
-            { number: '5K+', label: 'Companies' },
-            { number: '50K+', label: 'Job Seekers' }
-          ].map((stat, index) => (
-            <motion.div
-              key={index}
-              className="text-center"
-              whileHover={{ scale: 1.1 }}
-              transition={{ type: "spring", stiffness: 400 }}
+          {/* Search Bar */}
+          <motion.div 
+            variants={itemVariants}
+            className="flex flex-col sm:flex-row items-center gap-3 max-w-2xl mx-auto bg-white p-2 rounded-full shadow-xl border border-ash-grey ring-4 ring-white/50"
+          >
+            <div className="relative flex-1 w-full sm:w-auto">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Job title, keywords, or company..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && searchJobHandler()}
+                className="w-full pl-12 pr-4 py-3 rounded-full text-gray-800 font-medium placeholder-gray-400 outline-none bg-transparent"
+              />
+            </div>
+            <Button
+              onClick={searchJobHandler}
+              className="w-full sm:w-auto px-8 py-6 rounded-full bg-gradient-to-r from-vibrant-coral to-red-500 hover:from-red-500 hover:to-red-600 text-white font-bold text-lg shadow-md hover:shadow-lg transition-all duration-300"
             >
-              <div className="text-3xl font-bold gradient-text">{stat.number}</div>
-              <div className="text-sm text-gray-600 mt-1">{stat.label}</div>
-            </motion.div>
-          ))}
+              Search
+            </Button>
+          </motion.div>
+
+          {/* Stats */}
+          <motion.div 
+            variants={itemVariants}
+            className="grid grid-cols-3 gap-4 md:gap-8 mt-14 max-w-3xl mx-auto"
+          >
+            {[
+              { number: '10K+', label: 'Active Jobs', icon: Briefcase, color: "text-tropical-teal" },
+              { number: '500+', label: 'Companies', icon: Building2, color: "text-vibrant-coral" },
+              { number: '1M+', label: 'Happy Users', icon: Users, color: "text-purple-600" }
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                whileHover={{ y: -5 }}
+                className="flex flex-col items-center p-4 rounded-xl bg-white/60 border border-white/50 shadow-sm backdrop-blur-md"
+              >
+                <stat.icon className={`w-6 h-6 mb-2 ${stat.color}`} />
+                <div className="text-xl sm:text-2xl font-bold text-gray-800">{stat.number}</div>
+                <div className="text-xs sm:text-sm font-semibold text-gray-600">{stat.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+
         </motion.div>
       </div>
     </section>

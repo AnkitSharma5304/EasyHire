@@ -1,5 +1,5 @@
 import React from 'react';
-import { Facebook, Twitter, Linkedin, Instagram, Github } from 'lucide-react';
+import { Facebook, Twitter, Linkedin, Instagram, Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -39,13 +39,13 @@ const Footer = () => {
                 <Instagram className="w-5 h-5 text-white" />
               </a>
               <a
-                href="https://github.com/AnkitSharma5304"
-                aria-label="GitHub"
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=ankit676756@gmail.com"
+                aria-label="Email"
                 className="w-10 h-10 flex items-center justify-center bg-white/20 hover:bg-gray-800 rounded-lg transition-all duration-300 transform hover:scale-110"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Github className="w-5 h-5 text-white" />
+                <Mail className="w-5 h-5 text-white" />
               </a>
               <a
                 href="https://www.linkedin.com/in/ankit-sharma-67765228a/"
