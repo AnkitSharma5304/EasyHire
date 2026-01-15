@@ -1,5 +1,5 @@
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = "https://easyhire-t5qa.onrender.com";
 
 export const USER_API_END_POINT = `${API_BASE_URL}/api/v1/user`;
 export const JOB_API_END_POINT = `${API_BASE_URL}/api/v1/job`;
