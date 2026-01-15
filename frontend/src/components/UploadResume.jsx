@@ -30,8 +30,9 @@ const UploadResume = () => {
     try {
       setLoading(true);
 
+      // ✅ FIX: Hardcoded Render Backend URL to prevent "undefined" error
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/v1/upload-resume`,
+        "https://easyhire-t5qa.onrender.com/api/v1/upload-resume",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
