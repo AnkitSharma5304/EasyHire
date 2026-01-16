@@ -1,73 +1,25 @@
-# 💼 EasyHire - MERN Job Portal App
+# 💼 EasyHire - AI-Powered Job Portal
 
-*EasyHire* is a comprehensive job portal built with the *MERN stack* (MongoDB, Express.js, React.js, Node.js). It empowers both *job seekers* and *recruiters* with an intuitive and robust platform to interact, apply, post jobs, and even receive AI-based Job recommendations.
-
----
-## 🎥 Demo Video
-
-Watch a short walkthrough of the project here:  
-🔗 [Insert Your Demo Video Link Here]
-
-## 🎥 Live Link
-🔗 [Insert Your Live Project Link Here]
-
-## 🧩 Sample Images
-
-### 🧩 Student's Side
-
-#### 1. Login Page
-![Login Page](Insert_Your_Image_Path_Here)
-
-#### 2. Home Page
-![Home Page](Insert_Your_Image_Path_Here)
-
-#### 3. Student's Profile
-![Profile](Insert_Your_Image_Path_Here)
-
-#### 4. Job Postings
-![Job Postings](Insert_Your_Image_Path_Here)
-
-#### 5. Job Description
-![Job Description](Insert_Your_Image_Path_Here)
-
-#### 6. Skills Extraction from Resume
-![Skills Extraction](Insert_Your_Image_Path_Here)
-
-#### 7. Job Recommendation
-![Job Recommendation](Insert_Your_Image_Path_Here)
-
-#### 8. Applied Jobs
-![Applied Jobs](Insert_Your_Image_Path_Here)
+**EasyHire** is a comprehensive job portal built with the **MERN stack** (MongoDB, Express.js, React.js, Node.js). It empowers both **job seekers** and **recruiters** with an intuitive platform to interact, post jobs, and receive smart, AI-based job recommendations.
 
 ---
 
-### 🧩 Recruiter's Side
-
-#### 1. Registered Companies
-![Registered Companies](Insert_Your_Image_Path_Here)
-
-#### 2. Posted Jobs
-![Posted Jobs](Insert_Your_Image_Path_Here)
-
-#### 3. Applied Candidates
-![Applied Candidates](Insert_Your_Image_Path_Here)
-
-#### 4. Chat Box (Recruiter ↔ Candidate)
-![Chat Box](Insert_Your_Image_Path_Here)
+## 🚀 Live Demo
+🔗 **Live Site:** [https://easy-hire-two.vercel.app](https://easy-hire-two.vercel.app)
 
 ---
 
 ## 🚀 Features
 
-- 🔐 *Secure Authentication*: JWT-based login/signup for candidates and recruiters, with passwords hashed using Bcrypt.
-- 🔄 *Forgot Password*: Password reset functionality via email using *Nodemailer* and secure token generation using *Crypto*.
-- 📋 *Job Listings*: View a wide variety of jobs dynamically pulled from MongoDB.
-- 📤 *Job Posting*: Recruiters can register companies and post jobs with full control over listings.
-- 🗃 *Application Management*: Candidates can apply for jobs and track application status. Recruiters can review applications received.
-- 🤝 *Real-time Messaging*: In-app messaging between candidates and recruiters using *Socket.io*.
-- 🧠 *Skill-Based Job Recommendations*: Upload resumes and receive personalized job recommendations using *spaCy (Python NLP library)*.
-- 🌈 *Modern UI*: Designed with *Tailwind CSS* and [*shadcn/ui*](https://ui.shadcn.com/docs/components) components for a clean and elegant interface.
-- ☁ *Image Upload*: Upload and manage profile images via *Cloudinary*.
+- 🔐 **Secure Authentication**: JWT-based login/signup for candidates and recruiters, with secure password hashing (Bcrypt).
+- 🔄 **Forgot Password**: Secure email-based password reset flow using *Nodemailer*.
+- 📋 **Smart Job Listings**: Dynamic job feed with filtering and search capabilities.
+- 📤 **Recruiter Dashboard**: Recruiters can register companies, post jobs, and manage candidate applications.
+- 🗃 **Application Tracking**: Real-time status updates for applied jobs.
+- 🤝 **Real-time Chat**: Integrated messaging system for direct communication between recruiters and candidates (`Socket.io`).
+- 🧠 **AI Resume Analysis**: **Python + spaCy** microservice that parses PDF resumes to extract skills and match candidates with the best jobs automatically.
+- 🌈 **Modern UI**: Built with **React**, **Tailwind CSS**, and **Shadcn UI** for a responsive and accessible design.
+- ☁ **Cloud Storage**: Profile pictures and resume PDFs are securely stored on **Cloudinary**.
 
 ---
 
@@ -75,23 +27,66 @@ Watch a short walkthrough of the project here:  
 
 | Layer | Technologies |
 |---|---|
-| *Frontend* | React.js, React Router, Tailwind CSS, Shadcn UI |
-| *Backend* | Node.js, Express.js, Socket.io, Nodemailer |
-| *Database* | MongoDB Atlas |
-| *AI Module* | Python, Flask, spaCy, PyMuPDF |
-| *Auth* | JWT, Bcrypt, Crypto |
-| *Cloud* | Cloudinary (Image & PDF Storage) |
+| **Frontend** | React.js, Vite, Tailwind CSS, Shadcn UI, Redux Toolkit |
+| **Backend** | Node.js, Express.js, Socket.io, Nodemailer |
+| **Database** | MongoDB Atlas |
+| **AI / NLP** | Python (Flask), spaCy, PyMuPDF (PDF parsing) |
+| **DevOps** | Render (Backend/AI), Vercel (Frontend) |
 
 ---
 
-## 🚀 Getting Started
 
-### 📁 Project Structure
+| Login Page | Home Page |
+|:---:|:---:|
+| ![Login Page](./screenshots/login.png) | ![Home Page](./screenshots/home.png) |
+
+| Profile | Job Recommendations |
+|:---:|:---:|
+| ![Profile](./screenshots/profile.png) | ![Recommendations](./screenshots/recommendation.png) |
+
+### 🏢 Recruiter's Side
+
+| Admin Dashboard | Applicant Review |
+|:---:|:---:|
+| ![Dashboard](./screenshots/admin_dashboard.png) | ![Applicants](./screenshots/applicants.png) |
+
+---
+
+## 📁 Project Structure
 
 ```bash
 easyhire-mern-job-portal/
-├── backend/                # Node.js + Express backend APIs, MongoDB logic, and Python integration
-│   ├── python_logic/       # Python-based skill extractor using spaCy, invoked via backend
-│   └── .env                # Backend environment variables (not pushed to Git)
-├── frontend/               # React frontend with Tailwind CSS + shadcn/ui
+├── backend/                # Node.js + Express server
+│   ├── controllers/        # API logic
+│   ├── models/             # Mongoose Schemas
+│   ├── python_logic/       # Python scripts for AI Resume Parsing
+│   └── routes/             # API Endpoints
+├── frontend/               # React + Vite Client
+│   ├── src/
+│   │   ├── components/     # Reusable UI components
+│   │   ├── redux/          # State management
+│   │   └── utils/          # Constants & Helper functions
 └── README.md
+⚡ Getting Started Locally
+Clone the repository
+
+Bash
+
+git clone [https://github.com/AnkitSharma5304/EasyHire](https://github.com/AnkitSharma5304/EasyHire.git)
+cd easyhire
+Setup Backend
+
+Bash
+
+cd backend
+npm install
+# Create a .env file with MONGO_URI, SECRET_KEY, CLOUD_NAME, etc.
+npm start
+Setup Frontend
+
+Bash
+
+cd frontend
+npm install
+npm run dev
+Made with ❤️ by [ANKIT SHARMA]
