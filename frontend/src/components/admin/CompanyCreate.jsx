@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import Navbar from '../shared/Navbar';
-import Footer from '../shared/Footer'; // ✅ Imported Footer
+import Footer from '../shared/Footer';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { COMPANY_API_END_POINT } from '@/utils/constant';
 import { toast } from 'sonner';
 import { useDispatch } from 'react-redux';
 import { setSingleCompany } from '@/redux/companySlice';
@@ -25,14 +24,17 @@ const CompanyCreate = () => {
 
     try {
       setLoading(true);
+      
+      // ✅ FIX: Hardcoded Backend URL to ensure Cookies are sent correctly
       const res = await axios.post(
-        `${COMPANY_API_END_POINT}/register`,
+        "https://easyhire-t5qa.onrender.com/api/v1/company/register", 
         { companyName: companyName.trim() },
         {
           headers: { 'Content-Type': 'application/json' },
-          withCredentials: true,
+          withCredentials: true, // This is CRITICAL for the 401 error
         }
       );
+
       if (res?.data?.success) {
         dispatch(setSingleCompany(res.data.company));
         toast.success(res.data.message);
