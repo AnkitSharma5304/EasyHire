@@ -52,6 +52,7 @@ const Signup = () => {
       // ✅ Hardcoded URL is correct
       const res = await axios.post("https://easyhire-t5qa.onrender.com/api/v1/user/register", formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        withCredentials: true, // temporary
       });
 
       if (res.data.success) {
