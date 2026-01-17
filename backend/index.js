@@ -13,32 +13,29 @@ import applicationRoute from "./routes/application.route.js";
 import resumeRoutes from "./routes/resume.routes.js";
 import messageRoutes from "./routes/message.route.js";
 
-
 dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
 
+// ✅ REQUIRED for Render/Vercel HTTPS to work correctly
+app.set("trust proxy", 1);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// ✅ FIX: Hardcoded Origin. This MUST match your Vercel link exactly.
+const corsOptions = {
+    origin: 'https://easy-hire-two.vercel.app', // No trailing slash!
+    credentials: true, // Allow cookies to be sent
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
 
-app.set("trust proxy", 1);
-
-
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
-   // origin: process.env.FRONTEND_URL ,
-    credentials: true,
-  })
-);
- 
+app.use(cors(corsOptions));
 
 app.use("/uploads", express.static("uploads"));
-
 
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/company", companyRoute);
@@ -47,15 +44,14 @@ app.use("/api/v1/application", applicationRoute);
 app.use("/api/v1", resumeRoutes);
 app.use("/api/v1/messages", messageRoutes);
 
-
+// ✅ FIX: Hardcode Origin for Socket.io too
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
-   // origin: process.env.FRONTEND_URL,
+    origin: 'https://easy-hire-two.vercel.app',
+    methods: ["GET", "POST"],
     credentials: true,
   },
 });
-
 
 io.on("connection", (socket) => {
   console.log("🔌 New user connected:", socket.id);
@@ -73,16 +69,7 @@ io.on("connection", (socket) => {
   });
 });
 
-
-
 const PORT = process.env.PORT || 8000;
-//const PORT = process.env.PORT ;
-
-
-//const PORT = process.env.PORT || 8000;
-//const PORT = process.env.PORT ;
-
-
 
 const startServer = async () => {
   try {
