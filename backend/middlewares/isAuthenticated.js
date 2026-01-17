@@ -1,11 +1,21 @@
-
 import jwt from "jsonwebtoken";
 
 const isAuthenticated = async (req, res, next) => {
   try {
+    // 1. Try to get the token from the cookie first
+    let token = req.cookies?.token;
 
-    const token = req.cookies?.token;
+    // 2. If cookie is missing, look for the "Authorization" header
+    // The frontend sends it as: "Bearer <token>"
+    if (!token) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        // Extract the token part after "Bearer "
+        token = authHeader.split(" ")[1];
+      }
+    }
 
+    // 3. If STILL no token found in either place, reject request
     if (!token) {
       return res.status(401).json({
         message: "User not authenticated",
@@ -13,7 +23,7 @@ const isAuthenticated = async (req, res, next) => {
       });
     }
 
-
+    // 4. Verify the token
     const decode = jwt.verify(token, process.env.SECRET_KEY);
 
     if (!decode) {
@@ -22,7 +32,6 @@ const isAuthenticated = async (req, res, next) => {
         success: false,
       });
     }
-
 
     req.id = decode.userId;
     next();
@@ -34,6 +43,5 @@ const isAuthenticated = async (req, res, next) => {
     });
   }
 };
-
 
 export default isAuthenticated;
