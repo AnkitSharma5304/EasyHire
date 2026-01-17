@@ -5,10 +5,9 @@ import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { USER_API_END_POINT } from '@/utils/constant';
 import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
-import { setLoading } from '@/redux/authSlice';
+import { setLoading, setUser } from '@/redux/authSlice'; // ✅ Added setUser here
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -49,13 +48,24 @@ const Signup = () => {
 
     try {
       dispatch(setLoading(true));
+      
+      // ✅ Hardcoded URL is correct
       const res = await axios.post("https://easyhire-t5qa.onrender.com/api/v1/user/register", formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         withCredentials: true,
       });
+
       if (res.data.success) {
-        navigate('/login');
+        // ✅ 1. Save the Token (Crucial for 401 fix)
+        localStorage.setItem('token', res.data.token);
+
+        // ✅ 2. Update Redux so the app knows we are logged in
+        dispatch(setUser(res.data.user));
+
         toast.success(res.data.message);
+        
+        // ✅ 3. Go straight to Home (Skip Login Page)
+        navigate('/');
       }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Signup failed');
@@ -78,13 +88,13 @@ const Signup = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
+          {/* ... (Rest of your UI code remains exactly the same) ... */}
           <motion.div 
             className="w-1/2 bg-gradient-to-br from-vibrant-coral to-tropical-teal p-8 hidden md:flex flex-col items-center justify-center relative overflow-hidden"
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            {/* Animated background */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full mix-blend-overlay filter blur-xl opacity-20 animate-pulse-slow"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-lemon-chiffon rounded-full mix-blend-overlay filter blur-xl opacity-20 animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
             <div className="relative z-10">
@@ -195,6 +205,7 @@ const Signup = () => {
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
+                {/* Password strength indicators */}
                 <div className="mt-3 p-3 bg-soft-linen/50 rounded-lg space-y-1.5 text-xs">
                   <p className={`flex items-center gap-2 ${input.password.length >= 8 ? 'text-tropical-teal' : 'text-gray-500'}`}>
                     <span>{input.password.length >= 8 ? '✓' : '○'}</span> At least 8 characters

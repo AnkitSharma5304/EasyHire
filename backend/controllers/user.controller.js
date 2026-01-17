@@ -90,6 +90,7 @@ export const register = async (req, res) => {
         message: "Account created successfully.",
         success: true,
         user: newUser,
+        token: token,
       });
   } catch (error) {
     console.error("Register Error:", error);
@@ -150,6 +151,7 @@ export const login = async (req, res) => {
         message: `Welcome back ${user.fullname}`,
         success: true,
         user,
+        token: token,
       });
   } catch (error) {
     console.error("Login Error:", error);
