@@ -78,21 +78,13 @@ export const register = async (req, res) => {
       expiresIn: "1d",
     });
 
-    res
+    return res
       .status(201)
-      // ✅ NEW (Works on Localhost)
-      // .cookie("token", token, {
-      //   httpOnly: true,
-      //   sameSite: "lax", // Change from "None" to "lax"
-      //   secure: false, // Force false for localhost HTTP
-      //   maxAge: 24 * 60 * 60 * 1000,
-      // })
-      // THIS WHEN PRODUCTION CODE WILL BE DONE
       .cookie("token", token, {
+        maxAge: 1 * 24 * 60 * 60 * 1000,
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "None",
-        maxAge: 24 * 60 * 60 * 1000,
+        sameSite: 'None', // ✅ Required for Vercel -> Render
+        secure: true      // ✅ Always true for Render HTTPS
       })
       .json({
         message: "Account created successfully.",
@@ -146,23 +138,14 @@ export const login = async (req, res) => {
       expiresIn: "1d",
     });
 
-    res
+    return res
       .status(200)
-      // ✅ NEW (Works on Localhost)
-      // .cookie("token", token, {
-      //   httpOnly: true,
-      //   sameSite: "lax", // Change from "None" to "lax"
-      //   secure: false, // Force false for localhost HTTP
-      //   maxAge: 24 * 60 * 60 * 1000,
-      // })
-      // When prodction downside code 
       .cookie("token", token, {
+        maxAge: 1 * 24 * 60 * 60 * 1000,
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "None",
-        maxAge: 24 * 60 * 60 * 1000,
+        sameSite: 'None', // ✅ Required for Cross-Site
+        secure: true      // ✅ Always true for Render
       })
-
       .json({
         message: `Welcome back ${user.fullname}`,
         success: true,
@@ -176,13 +159,13 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    res
+    return res
       .status(200)
       .cookie("token", "", {
         maxAge: 0,
         httpOnly: true,
-        sameSite: "None",
-        secure: process.env.NODE_ENV === "production",
+        sameSite: 'None',
+        secure: true
       })
       .json({ message: "Logged out successfully.", success: true });
   } catch (error) {
@@ -195,15 +178,11 @@ export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
     if (!email)
-      return res
-        .status(400)
-        .json({ success: false, message: "Email is required" });
+      return res.status(400).json({ success: false, message: "Email is required" });
 
     const user = await User.findOne({ email });
     if (!user)
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found with this email" });
+      return res.status(404).json({ success: false, message: "User not found with this email" });
 
     const { token, hashedToken } = generateResetToken();
 
@@ -220,9 +199,7 @@ export const forgotPassword = async (req, res) => {
       text: message,
     });
 
-    return res
-      .status(200)
-      .json({ success: true, message: "Reset link sent to email" });
+    return res.status(200).json({ success: true, message: "Reset link sent to email" });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ success: false, message: "Server Error" });
@@ -234,9 +211,7 @@ export const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
     if (!password)
-      return res
-        .status(400)
-        .json({ success: false, message: "Password is required" });
+      return res.status(400).json({ success: false, message: "Password is required" });
 
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
     const user = await User.findOne({
@@ -245,19 +220,14 @@ export const resetPassword = async (req, res) => {
     });
 
     if (!user)
-      return res
-        .status(400)
-        .json({ success: false, message: "Token is invalid or expired" });
+      return res.status(400).json({ success: false, message: "Token is invalid or expired" });
 
     const isStrongPassword =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/.test(
-        password
-      );
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/.test(password);
     if (!isStrongPassword) {
       return res.status(400).json({
         success: false,
-        message:
-          "Password must be strong (8+ chars, uppercase, lowercase, number, special).",
+        message: "Password must be strong (8+ chars, uppercase, lowercase, number, special).",
       });
     }
 
@@ -267,14 +237,10 @@ export const resetPassword = async (req, res) => {
 
     await user.save();
 
-    return res
-      .status(200)
-      .json({ success: true, message: "Password reset successfully" });
+    return res.status(200).json({ success: true, message: "Password reset successfully" });
   } catch (err) {
     console.log(err);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal Server Error" });
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 
@@ -287,18 +253,17 @@ export const getUserById = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
-// updated this for production 
 
 export const updateProfile = async (req, res) => {
     try {
         const { fullname, email, phoneNumber, bio, skills } = req.body;
         
-        // ✅ FIX: Only process file if it exists
+        // Handle File Upload (Resume/PDF)
         let cloudResponse;
         if (req.file) {
             const fileUri = getDataUri(req.file);
             cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
-                resource_type: "raw", // Keep raw for PDFs/Resumes
+                resource_type: "raw", // Keeps format for PDFs
             });
         }
 
@@ -324,7 +289,7 @@ export const updateProfile = async (req, res) => {
         if (bio) user.profile.bio = bio;
         if (skillsArray) user.profile.skills = skillsArray;
 
-        // ✅ FIX: Only update resume/photo if a new file was uploaded
+        // Update resume if file uploaded
         if (cloudResponse) {
             user.profile.resume = cloudResponse.secure_url;
             user.profile.resumeOriginalName = req.file.originalname;
